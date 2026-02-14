@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Eternal Valentine</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Dancing+Script&display=swap" rel="stylesheet">
+<style>
+:root{
+  --lavender:#c8b6e2;
+  --deep-lav:#a48fd6;
+  --moonGlow:#f5f3ff;
+  --night1:#141422;
+  --night2:#1f1f38;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:'Playfair Display',serif;
+  background:radial-gradient(circle at 70% 20%, rgba(255,255,255,.08), transparent 40%),
+             linear-gradient(160deg,var(--night1),var(--night2));
+  overflow:hidden;
+}
+
+.center{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  text-align:center;
+  color:white;
+  position:relative;
+}
+
+.moon{
+  position:absolute;
+  top:60px;
+  right:80px;
+  width:120px;
+  height:120px;
+  background:radial-gradient(circle at 30% 30%, white, var(--moonGlow));
+  border-radius:50%;
+  box-shadow:0 0 40px rgba(255,255,255,.6),
+             0 0 80px rgba(200,182,226,.4);
+  animation:moonPulse 4s ease-in-out infinite;
+}
+@keyframes moonPulse{
+  0%,100%{transform:scale(1);opacity:.9}
+  50%{transform:scale(1.05);opacity:1}
+}
+
+.flower{
+  width:200px;
+  height:200px;
+  position:relative;
+  cursor:pointer;
+  transform:scale(.2);
+  opacity:0;
+  animation:bloom 2.5s ease forwards;
+}
+
+@keyframes bloom{
+  0%{transform:scale(.2);opacity:0}
+  60%{transform:scale(1.1);opacity:1}
+  100%{transform:scale(1)}
+}
+
+.petal{
+  position:absolute;
+  width:70px;
+  height:70px;
+  background:radial-gradient(circle at 30% 30%, #eee6ff, var(--lavender));
+  border-radius:50%;
+  top:50%;
+  left:50%;
+  transform-origin:center;
+  margin:-35px;
+}
+
+.petal:nth-child(1){transform:rotate(0deg) translate(55px)}
+.petal:nth-child(2){transform:rotate(45deg) translate(55px)}
+.petal:nth-child(3){transform:rotate(90deg) translate(55px)}
+.petal:nth-child(4){transform:rotate(135deg) translate(55px)}
+.petal:nth-child(5){transform:rotate(180deg) translate(55px)}
+.petal:nth-child(6){transform:rotate(225deg) translate(55px)}
+.petal:nth-child(7){transform:rotate(270deg) translate(55px)}
+.petal:nth-child(8){transform:rotate(315deg) translate(55px)}
+
+.flower.fade{
+  transform:scale(.8);
+  opacity:0;
+  transition:all 1.2s ease;
+}
+
+.falling{
+  position:absolute;
+  width:18px;
+  height:18px;
+  background:radial-gradient(circle at 30% 30%, #eee6ff, var(--lavender));
+  border-radius:50%;
+  opacity:.8;
+  animation:fall linear forwards;
+}
+
+@keyframes fall{
+  0%{transform:translateY(-10vh) rotate(0deg)}
+  100%{transform:translateY(110vh) rotate(360deg)}
+}
+
+@keyframes screenShake{
+  0%{transform:translate(0,0)}
+  25%{transform:translate(-4px,3px)}
+  50%{transform:translate(4px,-3px)}
+  75%{transform:translate(-3px,2px)}
+  100%{transform:translate(0,0)}
+}
+
+.shake{
+  animation:screenShake .4s infinite;
+}
+
+.reveal-text{
+  margin-top:30px;
+  font-size:18px;
+  opacity:.85;
+}
+</style>
+</head>
+<body>
+
+<div id="flowerScreen" class="center" style="display:none">
+  <div class="moon"></div>
+  <div class="flower" id="flower">
+    <div class="petal"></div>
+    <div class="petal"></div>
+    <div class="petal"></div>
+    <div class="petal"></div>
+    <div class="petal"></div>
+    <div class="petal"></div>
+    <div class="petal"></div>
+    <div class="petal"></div>
+  </div>
+  <p class="reveal-text">I really wanted to give you flowers this Valentine's Day so I made this.<br>
+  It's not much but at least it's eternal. Enjoy 🌸</p>
+</div>
+
+<audio id="swell" preload="auto">
+  <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_5b3e8f4f0d.mp3?filename=cinematic-orchestra-rise-115186.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const SECRET = "monique";
+
+function getParam(name){
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(name);
+}
+
+if(getParam('t') === SECRET){
+  document.getElementById('flowerScreen').style.display='flex';
+}else{
+  document.body.innerHTML = '<div style="color:white;text-align:center;margin-top:40vh;font-family:Playfair Display">This message is private.</div>';
+}
+
+const flower = document.getElementById('flower');
+
+function createPetal(){
+  const petal = document.createElement('div');
+  petal.className = 'falling';
+  petal.style.left = Math.random() * 100 + 'vw';
+  petal.style.animationDuration = (4 + Math.random() * 4) + 's';
+  document.body.appendChild(petal);
+  setTimeout(()=>{petal.remove()},8000);
+}
+setInterval(createPetal, 600);
+
+flower.addEventListener('click', ()=>{
+  flower.classList.add('fade');
+  document.getElementById("swell").play();
+  document.body.classList.add("shake");
+
+  for(let i=0;i<60;i++){
+    createBouquet();
+  }
+
+  setInterval(createBouquet, 400);
+  showValentineText();
+});
+
+function createBouquet(){
+  const bouquet = document.createElement("div");
+  bouquet.innerHTML = "💐";
+  bouquet.style.position = "fixed";
+  bouquet.style.fontSize = (30 + Math.random()*30) + "px";
+  bouquet.style.left = Math.random()*100 + "vw";
+  bouquet.style.bottom = "0px";
+  bouquet.style.zIndex = 9999;
+  bouquet.style.pointerEvents = "none";
+  bouquet.style.transform = `translateY(-${Math.random()*250}px)`;
+  bouquet.style.transition = "transform 2s ease-out";
+  document.body.appendChild(bouquet);
+}
+
+function showValentineText(){
+  const text = document.createElement("div");
+  text.innerText = "Happy Valentine’s Day";
+  text.style.position = "fixed";
+  text.style.top = "45%";
+  text.style.left = "50%";
+  text.style.transform = "translate(-50%, -50%)";
+  text.style.fontSize = "48px";
+  text.style.fontFamily = "'Dancing Script', cursive";
+  text.style.color = "#e6d6f5";
+  text.style.textShadow = "0 0 25px rgba(210,190,255,0.9)";
+  text.style.zIndex = 10000;
+  text.style.opacity = 0;
+  text.style.transition = "opacity 2s ease";
+
+  document.body.appendChild(text);
+  setTimeout(()=>{text.style.opacity = 1;},200);
+}
+</script>
+
+</body>
+</html>
